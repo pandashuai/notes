@@ -10,7 +10,7 @@ $ git commit -m "注释"   注： （-m 的参数是注释）
 
 
 # 查看修改状态
-# git status
+$ git status
 
 # 设置（没有设置就提交的情况会出现）
 $ git config --global user.email "you@example.com"

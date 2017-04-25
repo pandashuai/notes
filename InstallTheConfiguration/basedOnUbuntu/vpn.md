@@ -1,16 +1,18 @@
 ```
 #Connect to a remote server
-sudo ssh root@x.x.x.x
+$ sudo ssh root@x.x.x.x
 
 #update
-sudo apt-get update
+$ sudo apt-get update
 
 #install
-sudo apt-get install python-pip
-sudo pip install shadowsocks
+$ sudo apt-get install python-pip
+$ sudo pip install shadowsocks
 
 #Configuration
-sudo vi /etc/shadowsocks.json
+
+```
+$ sudo vi /etc/shadowsocks.json
 	{
 		"server":"your server ip",
 		"local_address":"127.0.0.1", 
@@ -21,12 +23,13 @@ sudo vi /etc/shadowsocks.json
 		"fast_open": false
 	}
 
+```
 
 #start up
-ssserver -c /etc/shadowsocks.json -d start
+$ ssserver -c /etc/shadowsocks.json -d start
 
 #stop
-ssserver -c /etc/shadowsocks.json -d stop
+$ ssserver -c /etc/shadowsocks.json -d stop
 
 ```
 
