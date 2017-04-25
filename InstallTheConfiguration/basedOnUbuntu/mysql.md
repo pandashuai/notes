@@ -1,4 +1,4 @@
-#install
+# install
 
 ```
 $ sudo apt-get install mysql-server
@@ -11,7 +11,7 @@ $ sudo apt-get install libmysqlclient-dev
 
 ```
 
-#Check if the installation is successful
+# Check if the installation is successful
 
 ```
 
@@ -20,7 +20,7 @@ $ sudo netstat -tap | grep mysql
 ```
 
 
-#login mysql
+# login mysql
 
 ```
 
@@ -29,7 +29,7 @@ $ mysql -u root -p
 ```
 
 
-#Allow remote users to log in to mysql
+# Allow remote users to log in to mysql
 
 ```
 $ vi /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -47,21 +47,21 @@ $ mysql -u root -p
 ```
 
 
-#start up
+# start up
 
 ```
 $ service mysql start
 
 ```
 
-#stop
+# stop
 
 ```
 $ service mysql stop
 
 ```
 
-#restart
+# restart
 
 ```
 

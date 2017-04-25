@@ -1,6 +1,6 @@
 # Configure nginx.conf 
 
-##Example
+## Example
 
 ```
 server{

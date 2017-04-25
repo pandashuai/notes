@@ -1,15 +1,15 @@
 ```
-#Connect to a remote server
+# Connect to a remote server
 $ sudo ssh root@x.x.x.x
 
-#update
+# update
 $ sudo apt-get update
 
-#install
+# install
 $ sudo apt-get install python-pip
 $ sudo pip install shadowsocks
 
-#Configuration
+# Configuration
 
 ```
 $ sudo vi /etc/shadowsocks.json
@@ -25,10 +25,10 @@ $ sudo vi /etc/shadowsocks.json
 
 ```
 
-#start up
+# start up
 $ ssserver -c /etc/shadowsocks.json -d start
 
-#stop
+# stop
 $ ssserver -c /etc/shadowsocks.json -d stop
 
 ```

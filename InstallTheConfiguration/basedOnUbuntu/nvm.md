@@ -1,7 +1,7 @@
 # update
 $ sudo apt-get update
 
-#install
+# install
 
 ```
 $ sudo apt-get install build-essential libssl-dev
@@ -12,19 +12,19 @@ $ source ~/.profile
 
 # Use nvm
 
-##View all node versions
+## View all node versions
 $ nvm ls-remote
 
-##Download the latest node
+## Download the latest node
 $ nvm install stable
 
-##Download other nodes
+## Download other nodes
 $ nvm install 7.9.0
 
-##View the existing version of the node
+## View the existing version of the node
 $ nvm ls
 
-##Set the node to use the current version
+## Set the node to use the current version
 $ nvm use 7.9.0
 
 ## Set the specified node version to default
