@@ -23,7 +23,6 @@ $ sudo vi /etc/shadowsocks.json
 		"method":"aes-256-cfb",
 		"fast_open": false
 	}
-
 ```
 
 # start up
