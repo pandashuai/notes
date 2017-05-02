@@ -13,6 +13,7 @@ $ sudo pip install shadowsocks
 
 ```
 $ sudo vi /etc/shadowsocks.json
+
 	{
 		"server":"your server ip",
 		"local_address":"127.0.0.1", 
