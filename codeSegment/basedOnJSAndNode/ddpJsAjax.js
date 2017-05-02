@@ -7,7 +7,7 @@ function ddpJsAjax(options) {
             type: 'GET',
             data: '',
             async: true,
-            dataType: false
+            dataType: false,
             success: function(data) {
 
             },
