@@ -7,6 +7,7 @@ $ sudo apt-get update
 
 # install
 $ sudo apt-get install python-pip
+
 $ sudo pip install shadowsocks
 
 # Configuration
