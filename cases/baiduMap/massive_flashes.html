@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>海量闪烁点</title>
+    <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #panel {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            z-index: 999;
+            color: #fff;
+        }
+        
+        #login {
+            position: absolute;
+            width: 300px;
+            height: 40px;
+            left: 50%;
+            top: 50%;
+            margin: -40px 0 0 -150px;
+        }
+        
+        #login input[type=password] {
+            width: 200px;
+            height: 30px;
+            padding: 3px;
+            line-height: 30px;
+            border: 1px solid #000;
+        }
+        
+        #login input[type=submit] {
+            width: 80px;
+            height: 38px;
+            display: inline-block;
+            line-height: 38px;
+        }
+        
+        .anchorBL {
+            /* opacity: 0 !important */
+            display: none !important
+        }
+        
+        #pointBox {
+            position: fixed;
+            padding: 2px 15px;
+            z-index: 9999;
+            text-align: center;
+            background: rgba(0, 0, 0, .6);
+            color: #efefef;
+            line-height: 32px;
+            font-size: 18px;
+            border-radius: 5px;
+            top: 100px;
+            left: 100px;
+            white-space: nowrap;
+            display: none;
+        }
+        
+        #pointBox::after {
+            position: absolute;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(0, 0, 0, .6);
+            content: "";
+            position: absolute;
+            width: 0;
+            top: 100%;
+            left: 50%;
+            margin-left: -10px;
+            z-index: 9999;
+        }
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=FRSLklyLV10LdFDlm9hRzX1XDHiKGDWq"></script>
+    <script src="http://lbsyun.baidu.com/jsdemo/data/points-sample-data.js"></script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="pointBox"></div>
+    <script type="text/javascript">
+        var map = new BMap.Map("map", {}); // 创建Map实例
+        var pointBox = document.getElementById('pointBox');
+        map.centerAndZoom(new BMap.Point(105.000, 38.000), 5); // 初始化地图,设置中心点坐标和地图级别
+        map.enableScrollWheelZoom(); //启用滚轮放大缩小
+        map.enableDragging();
+
+        var mapStyle = {
+            // features: ["road", "building", "water", "land"], //隐藏地图上的poi
+            style: "dark" //设置地图风格为高端黑
+        }
+        map.setMapStyle(mapStyle);
+        if (document.createElement('canvas').getContext) {
+
+            var BW = 0, //canvas width
+                BH = 0, //canvas height
+                stars = [], //存储所有星星对象的数组
+                timer = 5000, //定时器
+                rs = [], //最新的结果
+                py = null, //偏移
+                canvas = null, //画布元素
+                ctx = null; // 实例化画布
+
+            function Star(options) {
+                this.init(options);
+            }
+
+            Star.prototype.init = function(options) {
+                this.x = ~~(options.x);
+                this.y = ~~(options.y);
+                this.px = options.lng;
+                this.py = options.lat;
+                this.size = ~~(options.size);
+                this.maxSize = this.size > 6 ? 6 : this.size;
+                // 重算点大小
+                this.initSize();
+            }
+
+
+            // 重算点大小，循环时,让其闪烁
+            Star.prototype.initSize = function(size) {
+                if (~~(0.5 + Math.random() * 7) == 1) {
+                    this.size = 0;
+                } else {
+                    this.size = this.maxSize;
+                }
+            }
+
+            Star.prototype.render = function(i) {
+                if (this.x < 0 || this.y < 0 || this.x > BW || this.y > BH) {
+                    return;
+                }
+                // 画布绘图 - 开始
+                ctx.beginPath();
+                var gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, "rgba(7,120,249,1)");
+                gradient.addColorStop(1, "rgba(7,120,249,0.3)");
+                ctx.fillStyle = gradient;
+                ctx.arc(this.x, this.y, this.size, Math.PI * 2, false);
+                ctx.fill();
+                // 画布绘图 - 结束
+
+                // 重置点的大小
+                this.initSize();
+            }
+
+            function render() {
+                renderAction();
+                setTimeout(render, 180);
+            }
+            // 画布,设置点的数据
+            function renderAction() {
+                // 清除画布数据
+                ctx.clearRect(0, 0, BW, BH);
+                // 画布显示的样式
+                ctx.globalCompositeOperation = "lighter";
+                // 在画布设置已知的点
+                for (var i = 0, len = stars.length; i < len; ++i) {
+                    if (stars[i]) {
+                        stars[i].render(i);
+                    }
+                }
+            }
+            //要判断事件对象发生的位置，事件对象e的layerX和layerY属性表示Canvas内部坐标系中的坐标
+            function getEventPosition(ev) {
+                var x, y;
+                if (ev.layerX || ev.layerX == 0) {
+                    x = ev.layerX;
+                    y = ev.layerY;
+                } else if (ev.offsetX || ev.offsetX == 0) { // Opera
+                    x = ev.offsetX;
+                    y = ev.offsetY;
+                }
+                return {
+                    x: x,
+                    y: y
+                };
+            }
+
+            // 复杂的自定义覆盖物
+            function ComplexCustomOverlay(point) {
+                this._point = point;
+            }
+            ComplexCustomOverlay.prototype = new BMap.Overlay();
+            ComplexCustomOverlay.prototype.initialize = function(map) {
+                this._map = map;
+                // 实例化画布
+                canvas = this.canvas = document.createElement("canvas");
+                canvas.style.cssText = "position:absolute;left:0;top:0;";
+                ctx = canvas.getContext("2d");
+                var size = map.getSize();
+                // 设置画布大小
+                canvas.width = BW = size.width;
+                canvas.height = BH = size.height;
+                // 将画布嵌入地图
+                map.getPanes().labelPane.appendChild(canvas);
+                var d_find = false;
+                // 监听画布事件 - 鼠标移动
+                canvas.addEventListener('mousemove', function(e) {
+                    var p = getEventPosition(e);
+                    d_find = stars.find(function(val) {
+                        var size = val.maxSize;
+                        var d_x = (p.x >= (val.x - size / 2)) && (p.x <= (val.x + size / 2));
+                        var d_y = (p.y >= (val.y - size / 2)) && (p.y <= (val.y + size / 2));
+                        return d_x && d_y;
+                    });
+
+                    if (!d_find) {
+                        pointBox.style.display = 'none';
+                        return canvas.style.cursor = 'auto';
+                    }
+
+                    pointBox.style.display = 'block';
+                    var pbox_w = pointBox.offsetWidth / 2;
+                    var pbox_h = pointBox.offsetHeight;
+                    pointBox.style.left = (d_find.x - pbox_w) + 'px';
+                    pointBox.style.top = (d_find.y - pbox_h - 20) + 'px';
+                    pointBox.innerText = 'x:' + d_find.px + ', y:' + d_find.py;
+                    canvas.style.cursor = 'pointer';
+
+                });
+                // 监听画布事件 - 鼠标单击
+                // canvas.addEventListener('click', function(e) {
+                //     if (!d_find) {
+                //         return false;
+                //     }
+                //     console.log(d_find);
+                // });
+                return this.canvas;
+            }
+            ComplexCustomOverlay.prototype.draw = function() {
+                    var map = this._map;
+                    var bounds = map.getBounds();
+                    var sw = bounds.getSouthWest();
+                    var ne = bounds.getNorthEast();
+                    var pixel = map.pointToOverlayPixel(new BMap.Point(sw.lng, ne.lat));
+                    py = pixel;
+                    // 放大缩小时,重绘闪烁点
+                    if (rs.length > 0) {
+                        showStars(rs);
+                    }
+                }
+                // 实例化自定义覆盖物
+            var myCompOverlay = new ComplexCustomOverlay(new BMap.Point(116.407845, 39.914101));
+            // 将覆盖物放置地图
+            map.addOverlay(myCompOverlay);
+
+
+            /**
+             * 请求定位数据,并在地图上绘制出
+             * @param 请求的时间
+             * @param 成功后执行的回调函数
+             * 
+             */
+            var requestMgr = {
+                request: function(successCbk) {
+                    rs = data.data;
+                    showStars(rs);
+                    if (successCbk) {
+                        successCbk();
+                    }
+                    // var xhr = new XMLHttpRequest();
+                    // xhr.onreadystatechange = function() {
+                    //     if (xhr.readyState == 4 && xhr.status == 200) {
+                    //         rs = JSON.parse(xhr.responseText);
+                    //         showStars(rs);
+                    //         if (successCbk) {
+                    //             successCbk();
+                    //         }
+                    //     }
+                    // }
+                    // xhr.open("GET", url, true);
+                    // xhr.send(null);
+                }
+            }
+
+            //显示闪烁点
+            function showStars(rs) {
+                // stars.length = 0;
+                stars = [];
+                var temp = {};
+                for (var i = 0, len = rs.length; i < len; i++) {
+                    var item = rs[i];
+                    var px = map.pointToOverlayPixel({
+                        lng: item[0],
+                        lat: item[1]
+                    });
+                    var s = new Star({
+                        x: px.x - py.x,
+                        y: px.y - py.y,
+                        lng: item[0],
+                        lat: item[1],
+                        size: 6
+                    });
+                    stars.push(s);
+                    //}
+                }
+                canvas.style.left = py.x + "px";
+                canvas.style.top = py.y + "px";
+                renderAction();
+            }
+
+
+            function startCbk() {
+                requestMgr.request(function() {
+                    // 5秒重新获取数据
+                    // setTimeout(function() {
+                    //     console.log(1);
+                    //     startCbk();
+                    // }, timer);
+                });
+            };
+            // 初始化,置入定时器,使其循环,实现闪烁效果
+            render();
+            // 请求数据
+            startCbk();
+        } else {
+            alert('请在chrome、safari、IE8+以上浏览器运行该程序');
+        }
+    </script>
+</body>
+
+</html>
