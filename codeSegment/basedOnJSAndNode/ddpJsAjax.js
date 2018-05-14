@@ -1,6 +1,5 @@
 function ddpJsAjax(options) {
     var xhr;
-
     function ddpJsAjax(opt) {
         opt = Object.assign({
             url: "",
