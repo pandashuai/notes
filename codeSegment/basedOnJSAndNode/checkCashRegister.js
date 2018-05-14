@@ -1,4 +1,4 @@
-// 设计一个收银程序 checkCashRegister() ，其把购买价格(price)作为第一个参数 , 付款金额 (cash)作为第二个参数, 和收银机中零钱 (cid) 作为第三个参数.
+// 设计一个收银程序 checkCashRegister() ,其把购买价格(price)作为第一个参数 , 付款金额 (cash)作为第二个参数, 和收银机中零钱 (cid) 作为第三个参数.
 function checkCashRegister(price, cash, cid) {
     // 刚刚好
     if (price == cash) {
