@@ -22,44 +22,41 @@
             parentId: 'parent_dept_id',
             name: 'dept_name',
             rootId: 1
-        } attributes 
+        } param 
  */
-// 数组转森林
-function toTreeData(data, attributes) {
-    var resData = data;
-    var tree = [];
-    for (var i = 0; i < resData.length; i++) {
-        if (resData[i][attributes.parentId] == attributes.rootId) {
-            var obj = {
-                id: resData[i][attributes.id],
-                title: resData[i][attributes.name],
-                children: []
-            };
-            tree.push(obj);
-            resData.splice(i, 1);
+// 数组转树型结构
+function toTreeData(dataArr, param) {
+    var treeArr = [];
+    for (var i = 0; i < dataArr.length; i++) {
+        if (dataArr[i][param.parentId] == param.rootId) {
+            var obj = {};
+            obj[param.id] = dataArr[i][param.id];
+            obj[param.name] = dataArr[i][param.name];
+            obj.children = [];
+            treeArr.push(obj);
+            dataArr.splice(i, 1);
             i--;
         }
     }
-    run(tree);
 
-    function run(chiArr) {
-        if (resData.length !== 0) {
-            for (var i = 0; i < chiArr.length; i++) {
-                for (var j = 0; j < resData.length; j++) {
-                    if (chiArr[i].id == resData[j][attributes.parentId]) {
-                        var obj = {
-                            id: resData[j][attributes.id],
-                            title: resData[j][attributes.name],
-                            children: []
-                        };
-                        chiArr[i].children.push(obj);
-                        resData.splice(j, 1);
+    function createChildren(childArr) {
+        if (dataArr.length !== 0) {
+            for (var i = 0; i < childArr.length; i++) {
+                for (var j = 0; j < dataArr.length; j++) {
+                    if (childArr[i][param.id] == dataArr[j][param.parentId]) {
+                        var obj = {};
+                        obj[param.id] = dataArr[j][param.id];
+                        obj[param.name] = dataArr[j][param.name];
+                        obj.children = [];
+                        childArr[i].children.push(obj);
+                        dataArr.splice(j, 1);
                         j--;
                     }
                 }
-                run(chiArr[i].children);
+                createChildren(childArr[i].children);
             }
         }
     }
-    return tree;
+    createChildren(treeArr);
+    return treeArr;
 }
